@@ -1,4 +1,4 @@
-import { createUser, profileCurrentUser, currentUser } from "./firebase.js";
+import { createUser, profileCurrentUser, currentUser, loginUserAndPassword } from "./firebase.js";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -10,7 +10,7 @@ let clientIP = "";
 app.use(cors());
 app.use(bodyParser.json());
 
-app.post("/fire/createUser", async (req, res) => {
+app.post('/fire/createUser', async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let displayName = req.body.displayName ? req.body.displayName : "";
@@ -42,8 +42,36 @@ app.post("/fire/createUser", async (req, res) => {
     
     res.json(responseData);
   });
-
 });
+
+app.post('/fire/login', async (req, res) => {
+  let email = req.body.email;
+  let password = req.body.password;
+  clientIP = req.ip || req.socket.remoteAddress;
+  console.log("------------------------------------");
+  console.log({
+    email: email,
+    password: password,
+    metadata: {
+      endpoint: "/fire/login",
+      timestamp: new Date(),
+      clientIP: clientIP,
+    },
+  });
+
+  const userData = {
+    email: email,
+    password: password
+  }
+
+  await loginUserAndPassword(email, password).then(responseData => {
+    console.log(responseData);
+    console.log("------------------------------------");
+    
+    res.json(responseData);
+  })
+
+})
 
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
