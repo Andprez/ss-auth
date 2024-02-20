@@ -59,15 +59,14 @@ export function profileCurrentUser() {
   }
 }
 
-export function loginUserAndPassword(email, password){
-  signInWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
+export async function loginUserAndPassword(email, password){
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const user = userCredential.user;
-    console.log('Signin', {user});
-  })
-  .catch((error) => {
+    return user.stsTokenManager
+  } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log('Error al intentar login', errorMessage);
-  });
+    return { errorCode, errorMessage };
+  } 
 }
